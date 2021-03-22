@@ -1,0 +1,47 @@
+---
+title: "Chapter_8"
+author: "Mike Campbell"
+date: "22/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Drawing power curves of Figure 8.2
+#  sigma  theoretical standard deviation
+#  mu0   <- 100    expected value under H0
+#  mu1   <- 130    expected value under H1
+# alpha <- 0.05   probability of type I error
+demopower<-function (mu0, mu1, sigma, alpha) {
+# critical value for a level alpha test
+ crit <- qnorm(1-alpha, mu0, sigma)
+# power: probability for values > critical value under H1
+pow <- pnorm(crit, mu1, sigma, lower.tail=FALSE)
+xLims <- c(50, 180)
+left  <- seq(xLims[1],   crit, length.out=100)
+right <- seq(crit, xLims[2],   length.out=100)
+yH0r  <- dnorm(right, mu0, sigma)
+yH1l  <- dnorm(left,  mu1, sigma)
+yH1r  <- dnorm(right, mu1, sigma)
+
+curve(dnorm(x, mu0, sigma), xlim=xLims, lwd=2, col="red", xlab="x", ylab="density",
+      main="Normal distribution under H0 and H1", ylim=c(0, 0.03), xaxs="i")
+curve(dnorm(x, mu1, sigma), lwd=2, col="blue", add=TRUE)
+polygon(c(right, rev(right)), c(yH0r, numeric(length(right))), border=NA,
+        col=rgb(1, 0.3, 0.3, 0.6))
+polygon(c(left,  rev(left)),  c(yH1l, numeric(length(left))),  border=NA,
+        col=rgb(0.3, 0.3, 1, 0.6))
+polygon(c(right, rev(right)), c(yH1r, numeric(length(right))), border=NA,
+        density=5, lty=2, lwd=2, angle=45, col="darkgray")
+abline(v=crit, lty=1, lwd=3, col="red")
+text(crit+1,  0.03,  adj=0, label="critical value")
+text(mu0-10,  0.025, adj=1, label="distribution under H0")
+text(mu1+10,  0.025, adj=0, label="distribution under H1")
+text(crit+8,  0.01,  adj=0, label="power", cex=1.3)
+text(crit-12, 0.004,  expression(beta),  cex=1.3)
+text(crit+5,  0.0015, expression(alpha), cex=1.3)
+}
+
+
+```
+

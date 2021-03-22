@@ -1,0 +1,32 @@
+---
+title: "Chapter 6"
+author: "Mike Campbell"
+date: "22/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+cltdemo<-function(r,n) {
+# demonstration of the central limit theorem taking r samples of size n from the uniform distribution
+# This produces Figure 6.2
+library(ggplot2)
+library(gridExtra)
+
+samps <- runif(r*n)  ## uniform distribution [0,1]
+
+sample.means <-  rowMeans(matrix(samps,nrow=r,ncol=n)) ## calculate r means of size n
+pl1<-qplot(samps, geom="histogram", bins=30, main="Sample Histogram")
+pl2<-qplot(sample.means, geom="histogram", bins=30, main="Sample Mean Histogram")
+grid.arrange(pl1,pl2,ncol=2)
+m1<-mean(samps)
+m2<-mean(sample.means)
+s1<-sd(samps)
+s2<-sd(sample.means)
+cat(" Mean and standard deviation of the original data=", m1,s1,"\n", "Sample size of the means", n, "\n", "Mean and standard deviation of means=", m2,s2) 
+}
+
+```
+
+

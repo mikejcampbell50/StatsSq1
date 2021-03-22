@@ -1,0 +1,52 @@
+---
+title: "Statistics at Square One 12th Ed Chapter 5"
+author: "Mike Campbell"
+date: "08/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r chapter5}
+# Chapter 5
+# Fig 5.3 ROC curve and area under ROC curve
+p<-c(1,3,6,12,11,33,7)
+n<-c(9, 562, 169, 72, 35, 45, 0)
+ptot<-sum(p)
+ntot<-sum(n)
+l<-c("1+", "2+", "3+", "4+", "5+","6+")
+psum<-cumsum(p)
+nsum<-cumsum(n)
+for (i in 2:length(p)){
+sens<-c(1, 1-psum[i-1]/ptot)
+spec=c(0, nsum[i-1]/ntot)}
+sens<-(ptot-psum)/ptot
+spec<-nsum/ntot
+plot((1-spec), sens, type="l", xlab="1-Specificity", ylab="Sensitivity")
+for (i in 1:length(l)){
+text((1-spec[i]), sens[i], as.character(l[i]),pos=4, offset=0.5, cex=1)}
+lines(c(0,1), c(0,1), type="l")
+
+#To find area under the ROC curve using Simpson's rule
+AUC<-0
+for (i in 1 :(length(p)-1)) {
+AUC[i]<-(sens[i+1]+sens[i])*(spec[i+1]-spec[i])*0.5}
+s<-sum(AUC)
+cat("Area under ROC curve using Simpson's rule", round(s,3),"\n")
+
+
+# Wilcoxon calculation of ROC curve from Fig 5.3
+# First express data as individual values
+x<-c(rep(1,1),rep(2,3),rep(3,6),rep(4,12),rep(5,11),rep(6,33),rep(7,7))
+y<-c(rep(1,9),rep(2,562),rep(3,169),rep(4,72),rep(5,35),rep(6,45),rep(7,0))
+
+U<-as.numeric(wilcox.test(x,y,paired=FALSE)$statistic)
+AUCW<-U/(length(x)*length(y))
+cat("Area under ROC curve using Wilcoxon statistic", round(AUCW,3), "\n")
+
+
+```
+
