@@ -1,0 +1,138 @@
+---
+title: "Chapter_9"
+author: "Mike Campbell"
+date: "22/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+All the p values given in Table 9.6  using the data from Table 9.1 are produced using the following code.
+```
+#comparing p-values using different methods for data in table 9.1 
+# x are the data for treatment A
+x<-c(44,51,52,55,60,62,66,68,69,71,71,76,82,91,108)
+
+#y are the data for treatment B
+y<-c(52,64,68,74,79,83,84,88,95,97,101,116)
+
+#t test equal variance
+t.test(x,y, var.equal=TRUE)
+#Annoyingly R does not give the difference in means
+cat("Mean difference", (mean(x)-mean(y)))
+
+# t-test unequal variance
+t.test(x,y, var.equal=FALSE)
+
+#wilcoxon test
+
+wilcox.test(x,y)
+
+#permutation test
+library(EnvStats)
+twoSamplePermutationTestLocation(x,y,fcn="mean",n.permutations=5000)
+
+#Looking at effect of an outlier
+z<-c(52,64,68,74,79,83,84,88,95,97,101,160)
+
+t.test(x,z, var.equal=TRUE)
+t.test(x,z, var.equal=FALSE)
+
+#wilcoxon test
+
+wilcox.test(x,z)
+
+#permutation test
+twoSamplePermutationTestLocation(x,z,fcn="mean",n.permutations=5000)
+
+# Using regression Need to arrange all data in columns, and gp =1 for y's and 0 for x's
+ycom<-c(x,y)
+gp<-rep(c(0,1),c(15,12))
+mod<-lm(ycom~gp)
+summary(mod)
+confint(mod)
+
+''''
+The paired t-test using the data in Table 9.2 is given here
+''''
+
+# Table 9.2 Paired t-test
+x<-c(63,54,79,68,87,84,92,57,66,53,76,63)
+y<-c(55,62,108,77,83,78,79,94,69,66,72,77)
+t.test(x, y, paired=TRUE)
+'''
+The Mann-Whitney U test for the unpaired data in Table 9.3 is given here
+# Mann-Whitney  test for Table 9.3
+''''
+treatment.A<-c(38,26,29,41,36,31,32,30,35,33)
+treatment.B<-c(45,28,27,38,40,42,39,39,34,45)
+wilcox.test(treatment.A, treatment.B, paired=FALSE, correct=FALSE, conf.int=TRUE)
+''''
+The Wilcoxon test for the paired data in Table 9.5 is given here
+# Wilcoxon Table 9.5
+```
+x<-c(25,24,28,15,20,23,21,20,20,27)
+y<-c(18,27,25,20,17,24,24,22,19,19)
+wilcox.test(x,y, paired=TRUE, correct=FALSE, conf.int=TRUE)
+```
+
+All the CIs given in Table 9.7 using the data from Table 9.1 are produced using the following code.
+
+```
+# Table 9.7 comparing confidence intervals  for data from table 9.1 
+# x are the data for treatment A
+x<-c(44,51,52,55,60,62,66,68,69,71,71,76,82,91,108)
+
+#y are the data for treatment B
+y<-c(52,64,68,74,79,83,84,88,95,97,101,116)
+
+#t test
+t.test(x,y, var.equal=TRUE)
+t.test(x,y, var.equal=FALSE)
+
+
+wilcox.test(x,y, conf.int=TRUE)
+
+# bootstrap
+library(wBoot)
+
+boot.two.bca(x, y, mean, stacked=FALSE, alternative="two.sided",null.hyp=0, conf.level=0.95, R=9999)
+
+#Looking at effect of outlier
+z<-c(52,64,68,74,79,83,84,88,95,97,101,160)
+
+t.test(x,z, var.equal=TRUE)
+t.test(x,z, var.equal=FALSE)
+
+wilcox.test(x,z, conf.int=TRUE)
+
+diff<-function(x,z) mean(x)-mean(z)
+boot.two.bca(x, z, mean, stacked=FALSE, alternative="two.sided",null.hyp=0, conf.level=0.95, R=9999)
+```
+
+The code to solve Exercise 9.7 is given here
+```
+# Exercise 9.7
+placebo<-c(7,6,10,13,14,5,11,12)
+new<-c(7,10,4,11,2,8,8,6,1,5
+# t test with unequal variance
+t.test(new,placebo)
+
+#Mann Whitney U test
+wilcox.test(new,placebo, paired=FALSE, correct=FALSE)
+
+# Need to find the ranks of the combined data
+comb<-c(new,placebo)
+combr<-rank(comb)
+gp<-c(rep(1,10), rep(0,8))
+
+#Now split ranks into two groups
+ranknew<-ifelse(gp==1,combr, NA)
+rankplacebo<-ifelse(gp==0,combr, NA)
+# t-test on the ranks
+> t.test(ranknew,rankplacebo)
+```
+
+
