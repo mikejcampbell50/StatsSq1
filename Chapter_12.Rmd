@@ -1,0 +1,47 @@
+---
+title: "Chapter_12"
+author: "Mike Campbell"
+date: "29/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+k# Code for survival analysis
+# Need to install packages survminer and survival
+
+x<-      c(1, 5, 6, 6, 9, 10, 10, 10, 12, 12, 12, 12, 12,13, 15, 16, 20, 24, 24, 27, 32, 34, 36,36, 44)
+statusx<-c(0, 0, 1, 1, 0,  1,  1,  0,  1,  1,  1,  1,  0, 0,  0,  0,  0, 1,  0,  0,  1,  0,  0,  0  ,0)
+
+y<-      c(3, 6, 6, 6, 6, 8, 8, 12, 12, 12, 15, 16, 18, 18,20, 22, 24, 28, 28, 28, 30, 30, 33, 42)
+statusy<-c(0, 1, 1, 1, 1, 1, 1,  1,  1,  0,  0,  0,  0,  0, 1,  0,  1,  0,  0,  0,  1,  0,  0,  1)
+time<-c(x,y)
+event<-c(statusx,statusy)
+gp<-c(rep("Linolenic acid", length(x)), rep("Control",length(y)))
+dat<-data.frame(time, event, gp)
+
+
+library(survminer)
+
+
+library(survival)
+fit <- survfit(Surv(time, event) ~ gp, data = dat)
+ggsurvplot(fit, data = dat, risk.table = TRUE, palette=c("gray", "black"))
+mod<-survdiff(Surv(time, event) ~ gp, data = dat, rho=0)
+mod
+# the procedure only gives the chi-squared statistic to 1 d.f. To get a more accurate value use
+mod$chisq
+
+pchisq(mod$chisq, df=1, lower.tail = FALSE) 
+
+# to get the hazard ratio and confidence interval
+HR <- (mod$obs[2]/mod$exp[2])/(mod$obs[1]/mod$exp[1])
+se<-sqrt(1/mod$exp[2]+1/mod$exp[1])
+up95 <- exp((log(HR)) + qnorm(0.975)*se)
+low95 <-exp((log(HR)) - qnorm(0.975)*se)
+
+cat(" Hazard ratio", HR, "\n", "Lower 95% CI", low95, "Upper 95% CI", up95)
+nitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
